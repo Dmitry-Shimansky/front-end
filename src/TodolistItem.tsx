@@ -1,8 +1,13 @@
 import {FilterValues, Task, Todolist} from "./App.tsx";
-import {Button} from "./Button.tsx";
 import {type ChangeEvent} from 'react'
 import {CreateItemForm} from "./CreateItemForm.tsx";
 import {EditableSpan} from "./EditableSpan.tsx";
+import IconButton from '@mui/material/IconButton'
+import DeleteIcon from '@mui/icons-material/Delete'
+import Button from '@mui/material/Button'
+import Checkbox from '@mui/material/Checkbox'
+import {Box, List, ListItem} from "@mui/material";
+import {containerSx, getListItemSx} from './TodolistItem.styles'
 
 type Props = {
     todolist: Todolist
@@ -53,13 +58,15 @@ export const TodolistItem = ({todolist: {id, title, filter},
                 <h3>
                     <EditableSpan value={title} onChange={changeTodolistTitleHandler} />
                 </h3>
-                <Button title={'x'} onClick={deleteTodolistHandler}/>
+                <IconButton onClick={deleteTodolistHandler}>
+                    <DeleteIcon />
+                </IconButton>
             </div>
             <CreateItemForm onCreateItem={createTaskHandler}/>
             {tasks.length === 0 ? (
                 <p>Тасок нет</p>
             ) : (
-                <ul>
+                <List>
                     {tasks.map(task => {
                         const changeTaskStatusHandler = (event: ChangeEvent<HTMLInputElement>) => {
                             const newStatusValue = event.currentTarget.checked
@@ -69,26 +76,30 @@ export const TodolistItem = ({todolist: {id, title, filter},
                             changeTaskTitle(id, task.id, title)
                         }
                         return (
-                            <li key={task.id} className={task.isDone ? 'is-done' : ''}>
-                                <input type="checkbox" checked={task.isDone} onChange={changeTaskStatusHandler}/>
-                                <EditableSpan value={task.title} onChange={changeTaskTitleHandler}/>
-                                <Button title={'x'} onClick={() => deleteTaskHandler(task.id)}/>
-                            </li>
+                            <ListItem key={task.id} sx={getListItemSx(task.isDone)}>
+                                <div>
+                                    <Checkbox checked={task.isDone} onChange={changeTaskStatusHandler}/>
+                                    <EditableSpan value={task.title} onChange={changeTaskTitleHandler}/>
+                                </div>
+                                <IconButton onClick={() => deleteTaskHandler(task.id)}>
+                                    <DeleteIcon />
+                                </IconButton>
+                            </ListItem>
                         )
                     })}
-                </ul>
+                </List>
             )}
-            <div>
-                <Button className={filter === 'all' ? 'active-filter' : ''}
-                        title={'All'}
-                        onClick={() => changeFilterHandler('all')}/>
-                <Button className={filter === 'active' ? 'active-filter' : ''}
-                        title={'Active'}
-                        onClick={() => changeFilterHandler('active')}/>
-                <Button className={filter === 'completed' ? 'active-filter' : ''}
-                        title={'Completed'}
-                        onClick={() => changeFilterHandler('completed')}/>
-            </div>
+            <Box sx={containerSx}>
+                <Button variant={filter === 'all' ? 'contained' : 'text'}
+                        color={'inherit'}
+                        onClick={() => changeFilterHandler('all')}>All</Button>
+                <Button variant={filter === 'active' ? 'contained' : 'text'}
+                        color={'primary'}
+                        onClick={() => changeFilterHandler('active')}>Active</Button>
+                <Button variant={filter === 'completed' ? 'contained' : 'text'}
+                        color={'secondary'}
+                        onClick={() => changeFilterHandler('completed')}>Completed</Button>
+            </Box>
         </div>
     )
 }
